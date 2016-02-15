@@ -26,14 +26,13 @@ int main(int argc, char *argv[])
 if (inputFp = fopen(argv[1], "r"))    
     {
   outputFp = fopen(argv[2], "w+");
-  int i = 0;
   char nextChar = getc(inputFp);
   int numCharacters = 0;
   while (nextChar != EOF) {
     numCharacters++;
     nextChar = getc(inputFp);
-}
-total = numCharacters;
+  }
+  total = numCharacters;
   fseek(inputFp, -1, SEEK_END);
 
   for (int j = total; j >= 0; j--) {
@@ -56,12 +55,4 @@ total = numCharacters;
   close(inputFd);
   close(outputFd);
   exit(EXIT_SUCCESS);
-}
-
-int count_characters(FILE *f) 
-{
-    fseek(f, -1L, 2);
-    int last_pos = ftell(f);
-    last_pos++;
-    return last_pos;
 }
