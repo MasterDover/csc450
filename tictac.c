@@ -58,8 +58,10 @@
                     {
                         shm[i] = 'x';
                         notdone = 0;
-                        winCheck('x', shm);
-                        shm[9] = 'C';
+                         if(winCheck('x', shm) == 0)
+                        {
+                            shm[9] = 'C';
+                        }
                     }
                 }
             }
@@ -81,8 +83,11 @@
                     {
                         shm[i] = 'o';
                         notdone2 = 0;
-                        winCheck('o', shm);
-                        shm[9] = 'P';
+                        if(winCheck('o', shm) == 0)
+                        {
+                            shm[9] = 'P';
+                            //testing
+                        }
                     }
                 }
             }
@@ -102,14 +107,17 @@
     }
  }
  
- void winCheck(char c, char* shm)
+ int winCheck(char c, char* shm)
  {
      if((shm[0] && shm[3] && shm[6] == c) || (shm[1] && shm[4] && shm[7] == c) || (shm[2] && shm[5] && shm[8] == c) ||
         (shm[0] && shm[1] && shm[2] == c) || (shm[3] && shm[4] && shm[5] == c) || (shm[6] && shm[7] && shm[8] == c) ||
         (shm[0] && shm[4] && shm[8] == c) || (shm[2] && shm[4] && shm[6] == c))
         {
             printf("the winner is: %c\n", c);
+            return 1;
         }
-        
+        else
+        {
         return 0;
+        }
  }
