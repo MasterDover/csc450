@@ -9,7 +9,7 @@
 
 int main(int argc, char** argv)
 {
-    uint16_t port = 3000;
+    uint16_t port = 4000;
     int error;
     struct sockaddr_in* server = malloc(sizeof(struct sockaddr_in));
     server->sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -29,6 +29,7 @@ int main(int argc, char** argv)
         //Receive a reply from the server
         int MAX_SIZE = 2000 * sizeof(char);
         char* server_reply = malloc(MAX_SIZE);
+        
         while(1)
         {
             error = recv(sockfd, server_reply, MAX_SIZE, 0);
@@ -41,9 +42,15 @@ int main(int argc, char** argv)
                 puts("Reply received\n");
                 puts(server_reply);
                 
-                char* message = "yo\tyo";
-                send(sockfd, message , strlen(message) , 0);
+                //char* message = "yo\tyo";
+                
             }
+                char* message;
+                char scanFread[100];
+                scanf("%s", scanFread);
+                message = scanFread;
+                puts("Message sent....\n");
+                send(sockfd, message , strlen(message) , 0);
         }
     }
     free(server);
