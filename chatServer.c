@@ -8,6 +8,7 @@
 #include <semaphore.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <signal.h>
 
 void setupServerSocket();
 void broadcast(char* msg);
@@ -46,7 +47,9 @@ int main(int argc, char** argv)
    while(1)
    {
     printf("Listening....\n");
+    
     clientfd = accept(sockfd ,  (struct sockaddr *)server , &serverSize);
+   
     printf("Client Connected.... %d\n", clientfd);
     
     //add this client to our array of clients
@@ -59,12 +62,18 @@ int main(int argc, char** argv)
     if(pid == 0)
     {
         break;
+       
+    }
+    else
+    {
+        pthread_kill(pthread_self(), SIGCONT);
     }
    }
    
    //only do this if we are the child and have broken out of the infinite loop
    if(pid == 0)
-   {
+   { 
+      
        childStuff(clientfd);
    }
 }
@@ -72,8 +81,11 @@ int main(int argc, char** argv)
 
 void childStuff(int clientfd)
 {
-    sendMessage("                     <--Hello from the child.", clientfd);
+    
+    sendMessage("Hello from the child.  Do you have candy?", clientfd);
     receiveMessage(clientfd);
+    
+   
 }
 
 void receiveMessage(int clientfd)
@@ -116,7 +128,6 @@ void setupServerSocket()
 void sendMessage(char* msg, int client)
 {
     puts("Sending a message");
-    //printf("Client Number: %d\n", client); //checking client
     printf("Size of msg is: %d\n", (int)sizeof(*msg));
     printf("Size of msg is: %d\n", (int)strlen(msg));
     send(client , msg , strlen(msg) , 0);
@@ -127,23 +138,7 @@ void broadcast(char* msg)
 {
     int* clients = shmat(clientsID, NULL, 0);
     int* numberOfConnectedClients = shmat(numberOfConnectedClientsID, NULL, 0);
-    char* test;
-    int details;
-    strncpy(test, msg, 1);
-    if(strcmp(test, "\\") == 0)
-    {
-        
-        details = (int)msg[1];
-        details = details - 48;
-        printf("here: %d\n", msg[1]);
-        printf("here: %d\n", details);
-    }
-    else
-    {
-        details = -1;
-    }
     
-    /*
     int i;
     for(i = 0; i < *numberOfConnectedClients; i++)
     {
@@ -152,26 +147,4 @@ void broadcast(char* msg)
         send(clients[i] , msg , strlen(msg) , 0);
         puts("sent");
     }
-*/
-    //puts(strcmp(msg, "public"));
-    if(details == -1)
-    {
-        int i;
-        for(i = 0; i < *numberOfConnectedClients; i++)
-        {
-            printf("Trying to send to client with FD: %d\n", clients[i]);
-            //printf("Trying to send to client with FD: %d\n", *(clients + (i * sizeof(int))));
-            send(clients[i] , msg , strlen(msg) , 0);
-            puts("sent");
-        } 
-    }
-    else
-    {
-        printf("Trying to send to client with FD: %d\n", details);
-        //printf("Trying to send to client with FD: %d\n", *(clients + (i * sizeof(int))));
-        send(details , msg , strlen(msg) , 0);
-        puts("sent2");
-    }
-    
-    
 }
