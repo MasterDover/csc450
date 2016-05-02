@@ -5,7 +5,36 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <signal.h>
 
+void test (){
+    puts("client connected SIGNALLL");
+}
+void processChat(int sockfd, char* message)
+{
+    char* command;
+    char* who;
+    char* msg;
+
+    scanf("%ms", &command);
+    if(strcmp("tell", command) == 0)
+    {
+        scanf("%ms %m[^\n]", &who, &msg);
+        printf("Sending private message (%s) to: %s\n", msg, who);
+        send(sockfd, message , strlen(message) , 0);
+    }
+    else
+    {
+        scanf("%m[^\n]", &msg);
+        char* destination = malloc(sizeof(command) + sizeof(msg));
+        strcpy(destination, command);
+        strcat(destination, msg);
+        printf("Broadcasting: %s\n", destination);
+        send(sockfd, message , strlen(message) , 0);
+    }
+    //puts(command);
+    //puts(msg);
+}
 
 int main(int argc, char** argv)
 {
@@ -29,9 +58,10 @@ int main(int argc, char** argv)
         //Receive a reply from the server
         int MAX_SIZE = 2000 * sizeof(char);
         char* server_reply = malloc(MAX_SIZE);
-        
         while(1)
         {
+            
+            pthread_signal(SIGCONT, test);
             error = recv(sockfd, server_reply, MAX_SIZE, 0);
             if(error < 0)
             {
@@ -42,15 +72,10 @@ int main(int argc, char** argv)
                 puts("Reply received\n");
                 puts(server_reply);
                 
-                //char* message = "yo\tyo";
-                
             }
-                char* message;
-                char scanFread[100];
-                scanf("%s", scanFread);
-                message = scanFread;
-                puts("Message sent....\n");
-                send(sockfd, message , strlen(message) , 0);
+            
+            //char* message = "f u";
+            //processChat(sockfd, message);
         }
     }
     free(server);
